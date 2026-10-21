@@ -2,3 +2,5 @@
 data/
 .streamlit/secrets.toml
 __pycache__/
+*.json
+*.csv
