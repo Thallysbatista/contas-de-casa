@@ -8,7 +8,7 @@ import streamlit as st
 PESSOA_COR = {"MIRELLA": "#6250d6", "THALLYS": "#1baf7a"}
 RECEITA, DESPESA = "#2a78d6", "#eb6834"
 SERIE = "#2a78d6"          # gráficos de uma série só
-REFERENCIA = "#52514e"     # mediana, mesada e outras marcas de referência
+REFERENCIA = "#52514e"     # média, mesada e outras marcas de referência
 STATUS = {"ok": "#0ca30c", "atencao": "#fab219", "estourou": "#d03b3b"}
 
 INK, INK2, MUTED = "#0b0b0b", "#52514e", "#898781"

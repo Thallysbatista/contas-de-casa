@@ -58,8 +58,9 @@ existir, vale `MESADA_PADRAO` em `data.py`.
 - **Mesada individual:** limite **total** por pessoa e por mês, sem divisão por categoria. O que conta são as
   despesas com `PESSOA` = a pessoa.
 - **Parcelas contam na mesada** do mês em que caem.
-- **O casal não tem teto.** As despesas do casal são só acompanhadas, comparando com a mediana dos 6 meses
-  anteriores.
+- **O casal não tem teto.** As despesas do casal são só acompanhadas, comparando com a **média** dos 6 meses
+  anteriores. É média, e não mediana, de propósito: os meses fora da curva devem pesar, para mostrar o pior
+  cenário médio. Mês sem lançamento conta como R$ 0.
 - **Compromisso** é um lançamento com `n/m` na descrição (parcela) ou marcado como fixo (`FIXO` ou "(fixo)" na
   descrição).
 - **Lançamentos futuros** (parcelas e fixos já lançados até meses à frente) alimentam a aba *Próximos meses*. O
@@ -119,7 +120,7 @@ Python **3.12** no Streamlit Cloud. O pandas 3 exige Python 3.11 ou superior.
 - **Paleta** (em `ui.py`), validada para daltonismo e contraste com o validador da skill de dataviz:
   - Mirella `#6250d6` (violeta) · Thallys `#1baf7a` (verde-água): **cor fixa por pessoa no app inteiro**.
   - Receita `#2a78d6` (azul) · Despesa `#eb6834` (laranja). Gráficos de uma série só usam azul.
-  - Marcas de referência (mediana, mesada) em cinza `#52514e`. As cores de status (ok, atenção, estourou)
+  - Marcas de referência (média, mesada) em cinza `#52514e`. As cores de status (ok, atenção, estourou)
     aparecem sempre com ícone e texto, nunca só pela cor.
 - **Tema claro fixo.** Um modo escuro exigiria escolher e validar outra paleta para o fundo escuro.
 - **Celular primeiro:**

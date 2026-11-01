@@ -68,42 +68,43 @@ with aba_mes:
     st.subheader("Mês × últimos 6 meses")
     anteriores = [mes_ref - i for i in range(1, 7)]
     base = desp[desp["mes"].isin(anteriores)]
-    med_total = base.groupby("mes")["valor"].sum().reindex(anteriores, fill_value=0).median()
-    med_casal = (base[base["PESSOA"] == "CASAL"].groupby("mes")["valor"].sum()
-                 .reindex(anteriores, fill_value=0).median())
+    # média (não mediana) de propósito: os meses fora da curva devem pesar, para mostrar o pior cenário médio
+    media_total = base.groupby("mes")["valor"].sum().reindex(anteriores, fill_value=0).mean()
+    media_casal = (base[base["PESSOA"] == "CASAL"].groupby("mes")["valor"].sum()
+                   .reindex(anteriores, fill_value=0).mean())
     despesa_mes = d_mes["valor"].sum()
     casal_mes = d_mes.loc[d_mes["PESSOA"] == "CASAL", "valor"].sum()
     receita_mes = rec.loc[rec["mes"] == mes_ref, "valor"].sum()
     sobra = receita_mes - despesa_mes
     ui.cards([
-        ("Despesa total", brl(despesa_mes), ui.delta_html(despesa_mes - med_total, "vs mediana")),
-        ("Despesa do casal", brl(casal_mes), ui.delta_html(casal_mes - med_casal, "vs mediana")),
+        ("Despesa total", brl(despesa_mes), ui.delta_html(despesa_mes - media_total, "vs média 6m")),
+        ("Despesa do casal", brl(casal_mes), ui.delta_html(casal_mes - media_casal, "vs média 6m")),
         ("Receita", brl(receita_mes), "lançada até agora" if mes_ref == mes_hoje else "no mês"),
         ("Sobra", brl(sobra), f"<b>{sobra / receita_mes:.0%}</b> da receita" if receita_mes else "sem receita lançada"),
     ])
 
     st.subheader("Casal por categoria")
-    st.caption("Barra = este mês · traço = mediana dos 6 meses anteriores")
+    st.caption("Barra = este mês · traço = média dos 6 meses anteriores")
     cat_mes = d_mes[d_mes["PESSOA"] == "CASAL"].groupby("CATEGORIA")["valor"].sum()
     cat_med = (base[base["PESSOA"] == "CASAL"].pivot_table(index="mes", columns="CATEGORIA", values="valor",
                                                            aggfunc="sum")
-               .reindex(anteriores).fillna(0).median())
-    comp = pd.DataFrame({"mes": cat_mes, "mediana": cat_med}).fillna(0)
+               .reindex(anteriores).fillna(0).mean())
+    comp = pd.DataFrame({"mes": cat_mes, "media": cat_med}).fillna(0)
     comp = comp[(comp > 1).any(axis=1)].sort_values("mes")
     nomes = [c.title() for c in comp.index]
     fig = go.Figure()
     fig.add_bar(x=comp["mes"], y=nomes, orientation="h", name="Este mês", marker_color=ui.SERIE,
                 marker_cornerradius=4, hovertemplate="Este mês: R$ %{x:,.0f}<extra></extra>")
-    fig.add_scatter(x=comp["mediana"], y=nomes, mode="markers", name="Mediana 6m",
+    fig.add_scatter(x=comp["media"], y=nomes, mode="markers", name="Média 6m",
                     marker=dict(symbol="line-ns", size=16, line=dict(width=3, color=ui.REFERENCIA)),
-                    hovertemplate="Mediana 6m: R$ %{x:,.0f}<extra></extra>")
+                    hovertemplate="Média 6m: R$ %{x:,.0f}<extra></extra>")
     ui.layout(fig, altura=max(260, 30 * len(comp) + 60), moeda_y=False)
     fig.update_layout(hovermode="y unified")
     fig.update_xaxes(showgrid=True, gridcolor=ui.GRID, tickprefix="R$ ", tickformat=",.0f")
     fig.update_yaxes(gridcolor="rgba(0,0,0,0)", tickfont_color=ui.INK2)
     ui.grafico(fig)
 
-    comp["dif"] = comp["mes"] - comp["mediana"]
+    comp["dif"] = comp["mes"] - comp["media"]
     acima = comp[comp["dif"] > 50].sort_values("dif", ascending=False).head(3)
     if not acima.empty:
         st.markdown('<div class="dica"><b>Mais acima do normal:</b> ' + " · ".join(
