@@ -57,6 +57,8 @@ def _data(txt: str):
 
 def _valor(txt: str):
     limpo = re.sub(r"[^\d,\-]", "", txt or "").replace(",", ".")
+    if limpo.strip("-") == "" and "R$" in (txt or ""):
+        return 0.0  # formato contábil do Sheets mostra zero como "R$  -"
     try:
         return float(limpo)
     except ValueError:
